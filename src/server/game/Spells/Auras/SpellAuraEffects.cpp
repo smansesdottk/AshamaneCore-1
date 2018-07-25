@@ -1797,7 +1797,7 @@ void AuraEffect::HandleAuraModShapeshift(AuraApplication const* aurApp, uint8 mo
         }
 
         if (modelid > 0)
-            target->RestoreDisplayId();
+            target->RestoreDisplayId(target->IsMounted());
 
         switch (form)
         {
@@ -2056,7 +2056,7 @@ void AuraEffect::HandleAuraTransform(AuraApplication const* aurApp, uint8 mode, 
         if (target->getTransForm() == GetId())
             target->setTransForm(0);
 
-        target->RestoreDisplayId();
+        target->RestoreDisplayId(target->IsMounted());
 
         // Dragonmaw Illusion (restore mount model)
         if (GetId() == 42016 && target->GetMountID() == 16314)
@@ -3056,7 +3056,7 @@ void AuraEffect::HandleAuraControlVehicle(AuraApplication const* aurApp, uint8 m
         if (GetId() == 53111) // Devour Humanoid
         {
             target->Kill(caster);
-            if (caster->GetTypeId() == TYPEID_UNIT)
+            if (caster->IsCreature())
                 caster->ToCreature()->RemoveCorpse();
         }
 
