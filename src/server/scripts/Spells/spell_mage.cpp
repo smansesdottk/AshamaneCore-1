@@ -754,12 +754,7 @@ class spell_mage_conflagration : public AuraScript
 
     bool CheckProc(ProcEventInfo& eventInfo)
     {
-        bool _spellCanProc = (eventInfo.GetSpellInfo()->Id == SPELL_MAGE_FIREBALL);
-
-        if (_spellCanProc)
-            return true;
-
-        return false;
+        return eventInfo.GetSpellInfo()->Id == SPELL_MAGE_FIREBALL;
     }
 
     void Register() override
@@ -789,7 +784,10 @@ class spell_mage_blazing_barrier : public AuraScript
     {
         Unit* caster = auraEffect->GetCaster();
         Unit* target = dmgInfo.GetAttacker();
-        if (!caster || !target)
+        if (!caster || !target || caster == target)
+            return;
+
+        if (target->HasAura(GetId()))
             return;
 
         caster->CastSpell(target, SPELL_BLAZING_BARRIER_TRIGGER, true);
@@ -798,7 +796,7 @@ class spell_mage_blazing_barrier : public AuraScript
     void Register() override
     {
         DoEffectCalcAmount += AuraEffectCalcAmountFn(spell_mage_blazing_barrier::CalculateAmount, EFFECT_0, SPELL_AURA_SCHOOL_ABSORB);
-        OnEffectAbsorb += AuraEffectAbsorbFn(spell_mage_blazing_barrier::Absorb, EFFECT_0);
+        AfterEffectAbsorb += AuraEffectAbsorbFn(spell_mage_blazing_barrier::Absorb, EFFECT_0);
     }
 };
 
@@ -2519,8 +2517,7 @@ struct at_mage_frozen_orb : AreaTriggerAI
 
     void OnCreate() override
     {
-        if (Unit* caster = at->GetCaster())
-            at->SetUInt32Value(AREATRIGGER_SPELL_X_SPELL_VISUAL_ID, 40291);
+        at->SetUInt32Value(AREATRIGGER_SPELL_X_SPELL_VISUAL_ID, 40291);
     }
 
     void OnUpdate(uint32 diff) override
